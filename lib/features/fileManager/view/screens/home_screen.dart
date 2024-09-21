@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                     elevation: 0,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Image.asset("assets/3d/folder-dynamic-color.png"),
+                      child: Image.asset("assets/image/folder-dynamic-color.png"),
                     ),
                   ),
           ),
