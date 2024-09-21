@@ -33,103 +33,116 @@ class _HomePageState extends State<HomePage> {
         appBar: myController.appBar(context, () {
           setState(() {});
         }),
-        body: FileManager(
-          controller: myController.controller,
-          builder: (context, snapshot) {
-            final List<FileSystemEntity> entities = isSearching
-                ? snapshot
-                    .where((element) => element.path.contains(searchQuery))
-                    .toList()
-                : snapshot
-                    .where((element) =>
-                        element.path != '/storage/emulated/0/Android')
-                    .toList();
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Visibility(
-                      visible: !myController.fullScreen,
+        body: GetBuilder<Permissioncontrolle>(builder: (_) {
+          return permissioncontrolle.gotPermission
+              ? FileManager(
+                  controller: myController.controller,
+                  builder: (context, snapshot) {
+                    final List<FileSystemEntity> entities = isSearching
+                        ? snapshot
+                            .where(
+                                (element) => element.path.contains(searchQuery))
+                            .toList()
+                        : snapshot
+                            .where((element) =>
+                                element.path != '/storage/emulated/0/Android')
+                            .toList();
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: SizedBox(
-                              height: 50.h,
-                              child: TextField(
-                                onChanged: (value) {
-                                  setState(() {
-                                    isSearching = true;
-                                    searchQuery = value;
-                                    if (searchQuery.isEmpty ||
-                                        searchQuery == "" ||
-                                        searchQuery == " ") {
-                                      isSearching = false;
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  suffixIcon: const Icon(Icons.search),
-                                  filled: true,
-                                  fillColor: Colors.grey[200],
-                                  hintText: 'Search Files',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(16.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Recent Files",
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
-                                    )),
-                                InkWell(
-                                  onTap: () {
-                                    myController.fullScreen = true;
-                                    setState(() {});
-                                  },
-                                  child: Text(
-                                    "See All",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.sp,
+                          Visibility(
+                              visible: !myController.fullScreen,
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: SizedBox(
+                                      height: 50.h,
+                                      child: TextField(
+                                        onChanged: (value) {
+                                          setState(() {
+                                            isSearching = true;
+                                            searchQuery = value;
+                                            if (searchQuery.isEmpty ||
+                                                searchQuery == "" ||
+                                                searchQuery == " ") {
+                                              isSearching = false;
+                                            }
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          suffixIcon: const Icon(Icons.search),
+                                          filled: true,
+                                          fillColor: Colors.grey[200],
+                                          hintText: 'Search Files',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      )),
-                  GetBuilder<FilesController>(builder: (_) {
-                    return Expanded(
-                      child: GridView.builder(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 2, vertical: 0),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2),
-                        itemCount: entities.length,
-                        itemBuilder: (context, index) {
-                          FileSystemEntity entity = entities[index];
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("Recent Files",
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w600,
+                                            )),
+                                        InkWell(
+                                          onTap: () {
+                                            myController.fullScreen = true;
+                                            setState(() {});
+                                          },
+                                          child: Text(
+                                            "See All",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 10.sp,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )),
+                          GetBuilder<FilesController>(builder: (_) {
+                            return Expanded(
+                              child: GridView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 2, vertical: 0),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2),
+                                itemCount: entities.length,
+                                itemBuilder: (context, index) {
+                                  FileSystemEntity entity = entities[index];
 
-                          return fileWidget(entity, context);
-                        },
+                                  return fileWidget(entity, context);
+                                },
+                              ),
+                            );
+                          }),
+                        ],
                       ),
                     );
-                  }),
-                ],
-              ),
-            );
-          },
-        ),
+                  },
+                )
+              : Center(
+                  child: Text(
+                  'Please Allow access to Files',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400, color: Colors.teal),
+                ));
+        }),
         floatingActionButton: GetBuilder<Permissioncontrolle>(builder: (_) {
           return !permissioncontrolle.gotPermission
               ? FloatingActionButton.extended(
@@ -178,7 +191,8 @@ class _HomePageState extends State<HomePage> {
                     elevation: 0,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Image.asset("assets/image/folder-dynamic-color.png"),
+                      child:
+                          Image.asset("assets/image/folder-dynamic-color.png"),
                     ),
                   ),
           ),
